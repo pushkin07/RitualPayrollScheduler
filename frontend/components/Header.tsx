@@ -41,7 +41,7 @@ export function Header() {
   return (
     <header className="app-header" suppressHydrationWarning>
       <div className="header-brand">
-        <img className="header-logo" src="/ritual-logo.jpeg" alt="Ritual logo" />
+        <img className="header-logo" src="ritual-logo.jpeg" alt="Ritual logo" />
         <div>
           <p className="eyebrow">Ritual Payroll Scheduler</p>
           <h1>Contributor payouts, held and paid on-chain.</h1>

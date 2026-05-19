@@ -1134,7 +1134,7 @@ export default function Home() {
         </div>
         <div className="hero-panel">
           <div className="ritual-logo-frame">
-            <img src="/ritual-logo.jpeg" alt="Ritual" />
+            <img src="ritual-logo.jpeg" alt="Ritual" />
           </div>
           <span>Due payments ready now</span>
           <strong>{dueRecipients.length}</strong>
