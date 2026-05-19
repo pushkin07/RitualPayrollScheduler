@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="cache-control" content="no-store" />
+    <title>Ritual Payroll Scheduler - Clean Dashboard</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #000;
+        --panel: #111827;
+        --panel-2: #0b1220;
+        --border: #263244;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --green: #19d184;
+        --yellow: #fbbf24;
+        --red: #f87171;
+        --purple: #b36bff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 10% 10%, rgba(25, 209, 132, 0.13), transparent 34rem),
+          radial-gradient(circle at 88% 8%, rgba(179, 107, 255, 0.13), transparent 30rem),
+          #000;
+        color: var(--text);
+        font-family: Inter, Barlow, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid rgba(25, 209, 132, 0.22);
+      }
+      .brand {
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        gap: 16px;
+        align-items: center;
+      }
+      .brand img {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: #000;
+      }
+      h1, h2, h3, p { margin: 0; }
+      h1 {
+        font-size: clamp(2rem, 5vw, 5rem);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+      h2 { font-size: 1.65rem; }
+      h3 { font-size: 1.15rem; }
+      .eyebrow {
+        color: var(--green);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .muted {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .card, .notice {
+        border: 1px solid rgba(156, 163, 175, 0.18);
+        border-radius: 8px;
+        background: rgba(17, 24, 39, 0.9);
+        padding: 20px;
+      }
+      .notice {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        border-color: rgba(25, 209, 132, 0.35);
+        margin-top: 18px;
+      }
+      .button {
+        min-height: 42px;
+        border-radius: 8px;
+        border: 1px solid var(--green);
+        background: transparent;
+        color: var(--green);
+        padding: 0 16px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .button.secondary {
+        border-style: dashed;
+        border-color: var(--yellow);
+        color: var(--yellow);
+      }
+      .button.ghost {
+        border-color: var(--border);
+        color: var(--muted);
+      }
+      .button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(156, 163, 175, 0.12);
+      }
+      .row:first-child { border-top: 0; }
+      .row span { color: var(--muted); }
+      .mono {
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        overflow-wrap: anywhere;
+      }
+      .status {
+        display: inline-flex;
+        min-height: 28px;
+        align-items: center;
+        border-radius: 6px;
+        padding: 0 10px;
+        border: 1px solid rgba(25, 209, 132, 0.35);
+        color: var(--green);
+        font-weight: 800;
+      }
+      .status.inactive {
+        border-color: rgba(251, 191, 36, 0.38);
+        color: var(--yellow);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+      }
+      th, td {
+        border-top: 1px solid rgba(156, 163, 175, 0.13);
+        padding: 13px 10px;
+        text-align: left;
+      }
+      th {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      a { color: var(--green); }
+      .danger { color: var(--red); }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      @media (max-width: 900px) {
+        header, .grid { grid-template-columns: 1fr; display: grid; }
+        .brand { grid-template-columns: 54px 1fr; }
+        .brand img { width: 54px; height: 54px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand">
+          <img src="/ritual-logo.jpeg" alt="Ritual logo" />
+          <div>
+            <p class="eyebrow">Ritual Payroll Scheduler</p>
+            <h1>Clean payroll dashboard</h1>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="button" id="connect">Connect wallet</button>
+          <button class="button secondary" id="repair">Fix local display</button>
+        </div>
+      </header>
+
+      <section class="notice">
+        <div>
+          <h2 id="headline">Loading payroll state...</h2>
+          <p class="muted" id="summary">This page is separate from the old React screen and ignores its stale render state.</p>
+        </div>
+        <a href="/?fresh=clean-dashboard">Old app</a>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <p class="eyebrow">Contract</p>
+          <h2>Payroll contract</h2>
+          <div id="contractRows"></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Automation</p>
+          <h2>Hosted keeper</h2>
+          <div id="automationRows"></div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 18px">
+        <p class="eyebrow">Recipients</p>
+        <h2>Payment entries</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Wallet</th>
+              <th>Amount</th>
+              <th>Next payment</th>
+              <th>Paid</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recipients"></tbody>
+        </table>
+      </section>
+
+      <section class="card" style="margin-top: 18px">
+        <p class="eyebrow">History</p>
+        <h2>Payment history</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Recipient</th>
+              <th>Wallet</th>
+              <th>Amount</th>
+              <th>Timestamp</th>
+              <th>Explorer</th>
+            </tr>
+          </thead>
+          <tbody id="history"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      const WORKER_URL = "https://ritual-payroll-scheduler-automation.pushkin-evgenii01.workers.dev";
+      const EXPLORER = "https://explorer.ritualfoundation.org";
+      const KEYS = {
+        contract: "ritual-payroll-scheduler-contract-address",
+        name: "ritual-payroll-scheduler-payroll-name",
+        recipients: "ritual-payroll-scheduler-local-recipients",
+        history: "ritual-payroll-scheduler-local-payment-history",
+        payrollFunds: "ritual-payroll-scheduler-local-funded-balance",
+        keeperFunds: "ritual-payroll-scheduler-local-keeper-fee-balance"
+      };
+      const verified = {
+        contract: "0xda4a54ae5a9e30ebd51f8f67cff35430ea778ccc",
+        wallet: "0x5d4B7b985Ea66b6Bab9090eA3ca5d504dAedC697",
+        times: [1778775000, 1778775300],
+        timestamp: 1778776213,
+        amount: "10000000000000000",
+        label: "test2"
+      };
+
+      const state = {
+        account: "",
+        chainId: "",
+        registrations: []
+      };
+
+      function readArray(key) {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function writeArray(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function short(value) {
+        return value ? `${value.slice(0, 6)}...${value.slice(-4)}` : "Not set";
+      }
+
+      function formatAmount(value) {
+        try {
+          const raw = BigInt(value || "0");
+          const whole = raw / 1000000000000000000n;
+          const decimals = String(raw % 1000000000000000000n).padStart(18, "0").slice(0, 4).replace(/0+$/, "");
+          return decimals ? `${whole}.${decimals} RITUAL` : `${whole} RITUAL`;
+        } catch {
+          return "0 RITUAL";
+        }
+      }
+
+      function formatTime(seconds) {
+        if (!seconds) return "Not set";
+        return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(Number(seconds) * 1000));
+      }
+
+      function row(label, value) {
+        return `<div class="row"><span>${label}</span><strong class="mono">${value}</strong></div>`;
+      }
+
+      function getContractAddress() {
+        return localStorage.getItem(KEYS.contract) || verified.contract;
+      }
+
+      function forceRepair() {
+        localStorage.setItem(KEYS.contract, verified.contract);
+        localStorage.setItem(KEYS.name, localStorage.getItem(KEYS.name) || "Ritual Contributor Payroll");
+
+        const recipients = readArray(KEYS.recipients);
+        const updated = recipients.map((recipient) => {
+          if (String(recipient.label || "").toLowerCase() !== "test2") return recipient;
+          return {
+            ...recipient,
+            wallet: recipient.wallet || verified.wallet,
+            amount: recipient.amount || verified.amount,
+            active: false,
+            paidCount: 1,
+            nextPaymentTime: Number(recipient.nextPaymentTime || recipient.startTime || verified.times[0])
+          };
+        });
+
+        for (const [index, time] of verified.times.entries()) {
+          const exists = updated.some((recipient) => String(recipient.label || "").toLowerCase() === "test2" && Number(recipient.nextPaymentTime) === time);
+          if (!exists) {
+            updated.push({
+              id: 9000 + index,
+              label: verified.label,
+              wallet: verified.wallet,
+              amount: verified.amount,
+              frequency: 0,
+              scheduleType: "custom",
+              repeatEvery: 1,
+              startTime: time,
+              nextPaymentTime: time,
+              active: false,
+              paidCount: 1,
+              addTxHash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            });
+          }
+        }
+        writeArray(KEYS.recipients, updated);
+
+        const history = readArray(KEYS.history);
+        for (const time of verified.times) {
+          const exists = history.some((payment) => String(payment.recipient || "").toLowerCase() === "test2" && Number(payment.timestamp) === verified.timestamp);
+          if (!exists) {
+            history.push({
+              recipient: verified.label,
+              wallet: verified.wallet,
+              amount: verified.amount,
+              timestamp: verified.timestamp
+            });
+          }
+        }
+        writeArray(KEYS.history, history);
+        render("Local dashboard fixed from verified on-chain state.");
+      }
+
+      async function connectWallet() {
+        if (!window.ethereum) {
+          render("No browser wallet found.");
+          return;
+        }
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        state.account = accounts[0] || "";
+        state.chainId = await window.ethereum.request({ method: "eth_chainId" });
+        render("Wallet connected.");
+      }
+
+      async function refreshBackend() {
+        try {
+          const response = await fetch(`${WORKER_URL}/registrations`, { cache: "no-store" });
+          const data = await response.json();
+          state.registrations = data.registrations || [];
+        } catch (error) {
+          state.registrations = [];
+        }
+      }
+
+      function render(message) {
+        const contract = getContractAddress();
+        const recipients = readArray(KEYS.recipients).filter((recipient) => String(recipient.label || "").trim());
+        const history = readArray(KEYS.history);
+        const registration = state.registrations.find((item) => String(item.contractAddress || "").toLowerCase() === contract.toLowerCase());
+
+        document.getElementById("headline").textContent = message || "Clean dashboard loaded.";
+        document.getElementById("summary").textContent = "This page reads the same browser storage, but renders it without the old React state.";
+        document.getElementById("contractRows").innerHTML =
+          row("Contract", `<a href="${EXPLORER}/address/${contract}" target="_blank">${short(contract)}</a>`) +
+          row("Payroll name", localStorage.getItem(KEYS.name) || "Ritual Contributor Payroll") +
+          row("Payroll funds", formatAmount(localStorage.getItem(KEYS.payrollFunds))) +
+          row("Automation fee balance", formatAmount(localStorage.getItem(KEYS.keeperFunds))) +
+          row("Wallet", short(state.account));
+
+        document.getElementById("automationRows").innerHTML =
+          row("Backend", "Connected") +
+          row("Registration", registration ? "Registered" : "Not found") +
+          row("Last status", registration?.lastStatus || "Not checked") +
+          row("Last check", registration?.lastCheckedAt ? new Date(registration.lastCheckedAt).toLocaleString() : "Not available") +
+          row("Last tx", registration?.lastTxHash ? `<a href="${EXPLORER}/tx/${registration.lastTxHash}" target="_blank">${short(registration.lastTxHash)}</a>` : "None");
+
+        document.getElementById("recipients").innerHTML = recipients.length
+          ? recipients
+              .map(
+                (recipient) => `<tr>
+                  <td>${recipient.label}</td>
+                  <td class="mono">${short(recipient.wallet || "")}</td>
+                  <td>${formatAmount(recipient.amount)}</td>
+                  <td>${formatTime(recipient.nextPaymentTime)}</td>
+                  <td>${recipient.paidCount || 0}</td>
+                  <td><span class="status ${recipient.active ? "" : "inactive"}">${recipient.active ? "active" : "inactive"}</span></td>
+                </tr>`
+              )
+              .join("")
+          : `<tr><td colspan="6">No local recipients saved.</td></tr>`;
+
+        document.getElementById("history").innerHTML = history.length
+          ? history
+              .map(
+                (payment) => `<tr>
+                  <td>${payment.recipient || "recipient"}</td>
+                  <td class="mono">${short(payment.wallet || "")}</td>
+                  <td>${formatAmount(payment.amount)}</td>
+                  <td>${formatTime(payment.timestamp)}</td>
+                  <td>${payment.txHash ? `<a href="${EXPLORER}/tx/${payment.txHash}" target="_blank">${short(payment.txHash)}</a>` : "Synced from verified state"}</td>
+                </tr>`
+              )
+              .join("")
+          : `<tr><td colspan="5">No payment history saved.</td></tr>`;
+      }
+
+      document.getElementById("connect").addEventListener("click", connectWallet);
+      document.getElementById("repair").addEventListener("click", forceRepair);
+
+      refreshBackend().then(() => {
+        forceRepair();
+      });
+    </script>
+  </body>
+</html>

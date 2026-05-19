@@ -1,0 +1,18 @@
+{
+  "name": "ritual-payroll-scheduler-automation-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "mkdir -p .wrangler-home && HOME=$PWD/.wrangler-home XDG_CONFIG_HOME=$PWD/.wrangler-home wrangler deploy src/worker.ts --config wrangler.example.toml --dry-run --outdir dist",
+    "dev": "mkdir -p .wrangler-home && HOME=$PWD/.wrangler-home XDG_CONFIG_HOME=$PWD/.wrangler-home wrangler dev --config wrangler.toml",
+    "deploy": "mkdir -p .wrangler-home && HOME=$PWD/.wrangler-home XDG_CONFIG_HOME=$PWD/.wrangler-home wrangler deploy --config wrangler.toml"
+  },
+  "dependencies": {
+    "viem": "^2.23.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250507.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^3.99.0"
+  }
+}

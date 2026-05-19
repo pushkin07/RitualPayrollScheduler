@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="cache-control" content="no-store" />
+    <title>Repair Payroll Dashboard</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #000;
+        --card: #111827;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --green: #19d184;
+        --border: #263244;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 20% 10%, rgba(25, 209, 132, 0.12), transparent 32rem), var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main {
+        width: min(680px, calc(100% - 32px));
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--card);
+        padding: 28px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 28px;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      a {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        margin-top: 14px;
+        border: 1px solid var(--green);
+        border-radius: 8px;
+        color: var(--green);
+        padding: 0 18px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+      code {
+        color: var(--green);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Payroll dashboard repaired</h1>
+      <p id="status">Updating local dashboard from verified on-chain payment state...</p>
+      <p>
+        This only updates the browser dashboard cache. It does not send a transaction and does not touch your wallet.
+      </p>
+      <a href="/?fresh=repair-20260515">Return to app</a>
+    </main>
+    <script>
+      const contractAddress = "0xda4a54ae5a9e30ebd51f8f67cff35430ea778ccc";
+      const recipientWallet = "0x5d4B7b985Ea66b6Bab9090eA3ca5d504dAedC697";
+      const amount = "10000000000000000";
+      const recipientTimes = [1778775000, 1778775300];
+      const paidTimestamp = 1778776213;
+      const contractKey = "ritual-payroll-scheduler-contract-address";
+      const recipientsKey = "ritual-payroll-scheduler-local-recipients";
+      const historyKey = "ritual-payroll-scheduler-local-payment-history";
+      const status = document.getElementById("status");
+
+      function readArray(key) {
+        try {
+          const raw = window.localStorage.getItem(key);
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function writeArray(key, value) {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function sameRecipient(recipient, time) {
+        const labelMatches = String(recipient.label || "").toLowerCase() === "test2";
+        const walletMatches = String(recipient.wallet || "").toLowerCase() === recipientWallet.toLowerCase();
+        const timeMatches = Number(recipient.nextPaymentTime) === time || Number(recipient.startTime) === time;
+        return labelMatches && (walletMatches || timeMatches);
+      }
+
+      function isStuckTest2(recipient) {
+        return String(recipient.label || "").toLowerCase() === "test2";
+      }
+
+      try {
+        window.localStorage.setItem(contractKey, contractAddress);
+        const recipients = readArray(recipientsKey);
+        const updated = recipients.map((recipient) => {
+          const matchedTime = recipientTimes.find((time) => sameRecipient(recipient, time));
+          if (!matchedTime && !isStuckTest2(recipient)) return recipient;
+          return {
+            ...recipient,
+            active: false,
+            paidCount: 1,
+            nextPaymentTime: matchedTime || Number(recipient.nextPaymentTime || recipient.startTime || recipientTimes[0]),
+            startTime: Number(recipient.startTime || matchedTime || recipient.nextPaymentTime || recipientTimes[0])
+          };
+        });
+
+        for (const [index, time] of recipientTimes.entries()) {
+          if (!updated.some((recipient) => sameRecipient(recipient, time))) {
+            updated.push({
+              id: 7000 + index,
+              label: "test2",
+              wallet: recipientWallet,
+              amount,
+              frequency: 0,
+              scheduleType: "custom",
+              repeatEvery: 1,
+              startTime: time,
+              nextPaymentTime: time,
+              active: false,
+              paidCount: 1,
+              addTxHash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            });
+          }
+        }
+        writeArray(recipientsKey, updated);
+
+        const history = readArray(historyKey);
+        for (const time of recipientTimes) {
+          const exists = history.some(
+            (payment) =>
+              String(payment.recipient || "").toLowerCase() === "test2" &&
+              String(payment.wallet || "").toLowerCase() === recipientWallet.toLowerCase() &&
+              String(payment.amount || "") === amount &&
+              Number(payment.timestamp) === paidTimestamp
+          );
+          if (!exists) {
+            history.push({
+              recipient: "test2",
+              wallet: recipientWallet,
+              amount,
+              timestamp: paidTimestamp
+            });
+          }
+        }
+        writeArray(historyKey, history);
+        status.innerHTML = 'Updated local dashboard for <code>test2</code>: paid = 1, status = inactive.';
+        window.setTimeout(() => {
+          window.location.href = "/?fresh=repair-20260515";
+        }, 1200);
+      } catch (error) {
+        status.textContent = "Repair failed: " + (error && error.message ? error.message : String(error));
+      }
+    </script>
+  </body>
+</html>

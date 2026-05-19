@@ -1,0 +1,11 @@
+name = "ritual-payroll-scheduler-automation"
+main = "src/worker.ts"
+compatibility_date = "2026-05-07"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+[[kv_namespaces]]
+binding = "REGISTRY_KV"
+id = "replace-with-kv-namespace-id"
+preview_id = "replace-with-preview-kv-namespace-id"

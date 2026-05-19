@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build:contracts": "mkdir -p .foundry-home .foundry-cache && if [ -x .foundry-solc/solc-0.8.24 ]; then HOME=$PWD/.foundry-home forge build --root contracts --cache-path $PWD/.foundry-cache --config-path $PWD/contracts/foundry.toml --use $PWD/.foundry-solc/solc-0.8.24; else HOME=$PWD/.foundry-home forge build --root contracts --cache-path $PWD/.foundry-cache --config-path $PWD/contracts/foundry.toml; fi",
+    "test:contracts": "mkdir -p .foundry-home .foundry-cache && if [ -x .foundry-solc/solc-0.8.24 ]; then HOME=$PWD/.foundry-home forge test --root contracts --cache-path $PWD/.foundry-cache --config-path $PWD/contracts/foundry.toml --use $PWD/.foundry-solc/solc-0.8.24; else HOME=$PWD/.foundry-home forge test --root contracts --cache-path $PWD/.foundry-cache --config-path $PWD/contracts/foundry.toml; fi",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "keeper": "node scripts/keeper.mjs"
+  }
+}
